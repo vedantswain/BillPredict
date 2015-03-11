@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="in.ac.iiitd.zenatix.billpredict.MainTabs.ElectricityFragment">
+
+    <in.ac.iiitd.zenatix.billpredict.CustomUI.MeterView
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:id="@+id/electricityMeterView"
+        android:focusableInTouchMode="false"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:ems="10"
+        android:id="@+id/electricityEditText"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_toStartOf="@+id/electricityBtn"
+        android:layout_toLeftOf="@+id/electricityBtn"
+        android:layout_alignBottom="@+id/electricityBtn"
+        android:layout_alignTop="@+id/electricityBtn"
+        android:hint="Electricity meter reading" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter"
+        android:id="@+id/electricityBtn"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="ESTIMATED BILL FOR THE MONTH"
+        android:id="@+id/textView"
+        android:layout_below="@+id/electricityMeterView"
+        android:layout_centerHorizontal="true"
+        android:visibility="visible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text=""
+        android:id="@+id/billNote"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/electricityEstimate"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center" />
+
+</RelativeLayout>

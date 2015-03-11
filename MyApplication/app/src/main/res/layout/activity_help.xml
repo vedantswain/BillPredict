@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="in.ac.iiitd.zenatix.billpredict.MenuActivities.HelpActivity"
+    android:background="@color/primaryDark">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+     />
+
+    <!--  This TextView will not swipe when you swipe in the ViewPager -->
+
+    <TextView
+        android:id="@+id/Title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:padding="10dip"
+        android:text="BillPredict"
+        android:textSize="18sp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:layout_above="@+id/Title"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_launcher" />
+
+</RelativeLayout>

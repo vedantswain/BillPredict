@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="WATER"
+        android:key="water_settings">
+        <EditTextPreference
+            android:key="LAST_DATE_WATER"
+            android:title="Previous Billing Date"
+            android:summary="Set your previous billing date for water"
+            android:hint="yyyy-MM-dd"
+            android:inputType="date"
+            android:dialogTitle="Previous billing date (Water)" />
+        <EditTextPreference
+            android:key="LAST_CYCLE_END_READING_WATER"
+            android:title="Previous Cycle End Reading"
+            android:summary="Set the final water meter reading from your previous cycle"
+            android:inputType="number"
+            android:dialogTitle="Previous Cycle End Reading (Water)" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="ELECTRICITY"
+        android:key="electricity_settings">
+        <EditTextPreference
+            android:key="LAST_DATE_ELECTRICITY"
+            android:title="Previous Billing Date"
+            android:summary="Set your previous billing date for electricity"
+            android:hint="yyyy-MM-dd"
+            android:inputType="date"
+            android:dialogTitle="Previous billing date (Electricity)" />
+        <EditTextPreference
+            android:key="LAST_CYCLE_END_READING_ELECTRICITY"
+            android:title="Previous Cycle End Reading "
+            android:summary="Set the final electricity meter reading from your previous cycle"
+            android:inputType="number"
+            android:dialogTitle="Previous Cycle End Reading (Electricity)" />
+    </PreferenceCategory>
+</PreferenceScreen>
