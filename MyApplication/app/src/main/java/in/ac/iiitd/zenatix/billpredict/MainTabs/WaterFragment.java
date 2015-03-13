@@ -207,6 +207,8 @@ public class WaterFragment extends Fragment {
         values.put(DatabaseContract.WaterEntry.READING_DATE, readingDate);
         values.put(DatabaseContract.WaterEntry.CYCLE_START_ID, lastCycleID);
 
+        Log.v(TAG,"Inserted with: "+lastCycleID);
+
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor=sharedPref.edit();
         editor.putString("LAST_UPDATE_WATER",readingDate);
@@ -238,6 +240,7 @@ public class WaterFragment extends Fragment {
         // New value for one column
         ContentValues values = new ContentValues();
         values.put(DatabaseContract.WaterEntry.METER_READING, meterReading);
+        values.put(DatabaseContract.WaterEntry.CYCLE_START_ID,lastCycleID);
 
         // Which row to update, based on the ID
         String selection = DatabaseContract.WaterEntry._ID + " LIKE ?";

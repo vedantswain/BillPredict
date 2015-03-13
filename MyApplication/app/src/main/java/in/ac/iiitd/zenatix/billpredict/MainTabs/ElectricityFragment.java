@@ -238,6 +238,7 @@ public class ElectricityFragment extends Fragment {
         // New value for one column
         ContentValues values = new ContentValues();
         values.put(DatabaseContract.ElectricityEntry.METER_READING, meterReading);
+        values.put(DatabaseContract.ElectricityEntry.CYCLE_START_ID,lastCycleID);
 
         // Which row to update, based on the ID
         String selection = DatabaseContract.ElectricityEntry._ID + " LIKE ?";

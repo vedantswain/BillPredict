@@ -138,6 +138,10 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
             openHistory();
             return true;
         }
+        else if (id == R.id.action_average){
+            openAverage();
+            return true;
+        }
 
 
         return super.onOptionsItemSelected(item);
@@ -362,6 +366,11 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
 
     private void openAbout(){
         Intent intent = new Intent(this,AboutActivity.class);
+        startActivity(intent);
+    }
+
+    private void openAverage(){
+        Intent intent = new Intent(this,DailyAverageActivity.class);
         startActivity(intent);
     }
 

@@ -71,6 +71,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="in.ac.iiitd.zenatix.billpredict.MainTabActivity" />
         </activity>
+        <activity
+            android:name=".DailyAverageActivity"
+            android:label="@string/title_activity_graph"
+            android:parentActivityName=".MainTabActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="in.ac.iiitd.zenatix.billpredict.MainTabActivity" />
+        </activity>
     </application>
 
 </manifest>

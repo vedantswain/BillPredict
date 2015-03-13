@@ -6,6 +6,7 @@
     <string name="action_help">Help</string>
     <string name="action_history">History</string>
     <string name="action_about">About</string>
+    <string name="action_average">Daily Average</string>
     <string name="title_activity_main_tab">BillPredict</string>
     <string name="title_section1">Water</string>
     <string name="title_section2">Electricity</string>
@@ -38,5 +39,7 @@
     <string name="about_paragraph_6">Estimated bill is only based on price per unit and does not include
         any other charges and taxes</string>
     <string name="title_activity_history">History</string>
+    <string name="title_activity_graph">Daily Average</string>
+    <string name="title_section3">Section 3</string>
 
 </resources>
