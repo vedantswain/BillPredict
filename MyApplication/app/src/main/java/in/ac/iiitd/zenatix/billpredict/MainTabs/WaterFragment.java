@@ -42,7 +42,7 @@ public class WaterFragment extends Fragment {
     EditText waterEditText;
     Button waterBtn;
     TextView waterEstimate,billNote;
-    Float lastCycleReading= -1f,scale=30f;
+    Float lastCycleReading= -1f,scale=30f,monthScale=30f;
     int waterCycleMonthNo=1;
     String lastCycleDate="";
 
@@ -102,6 +102,7 @@ public class WaterFragment extends Fragment {
         waterMeterView.setTitle(getString(R.string.title_section1));
         scale=scale*waterCycleMonthNo;
         waterMeterView.setScale(scale);
+        waterMeterView.setMonthScale(monthScale);
         waterMeterView.setUnit("kL");
 
         waterEditText=(EditText)inflateView.findViewById((R.id.waterEditText));
@@ -148,7 +149,7 @@ public class WaterFragment extends Fragment {
             if(consumption>=0) {
                 Float prediction = getPrediction(consumption);
                 waterMeterView.setProgress((consumption / scale) * 100);
-                waterMeterView.setTarget((prediction / (scale/waterCycleMonthNo)) * 100);
+                waterMeterView.setTarget((prediction / (monthScale)) * 100);
                 waterEstimate.setText("Rs." + Integer.toString((int)getEstimate(prediction)));
             }
             else
@@ -174,7 +175,7 @@ public class WaterFragment extends Fragment {
 
             if(lastCycleReading>-1 && consumption>=0) {
                 waterMeterView.setProgress((consumption / scale) * 100);
-                waterMeterView.setTarget((mPrediction / (scale/waterCycleMonthNo)) * 100);
+                waterMeterView.setTarget((mPrediction / (monthScale)) * 100);
                 waterEstimate.setText("Rs." + String.format("%.2f", getEstimate(mPrediction)));
             }
             else{
@@ -295,7 +296,7 @@ public class WaterFragment extends Fragment {
                 float factor=(curDate.getTime()-startDate.getTime())/1000/60/60/24;
                 factor++;
                 waterMeterView.setDays((int)factor);
-                Log.v(TAG,"Equation: ("+max+"/"+factor+")*"+cycle);
+                Log.v(TAG,"Equation: ("+max+"/"+factor+")*"+cycle+"="+((max/factor)*cycle));
                 return (max/factor)*cycle;
             } catch (ParseException e) {
                 e.printStackTrace();

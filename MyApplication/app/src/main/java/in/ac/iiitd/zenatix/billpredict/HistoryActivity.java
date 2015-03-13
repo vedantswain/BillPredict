@@ -148,10 +148,10 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.TabL
             // getItem is called to instantiate the fragment for the given page.
             Fragment fragment=null;
             switch(position){
-                case 1:
+                case 0:
                     fragment=new ElectricityHistoryFragment();
                     break;
-                case 0:
+                case 1:
                     fragment=new WaterHistoryFragment();
                     break;
 
@@ -169,9 +169,9 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.TabL
         public CharSequence getPageTitle(int position) {
             Locale l = Locale.getDefault();
             switch (position) {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
                 case 1:
+                    return getString(R.string.title_section1).toUpperCase(l);
+                case 0:
                     return getString(R.string.title_section2).toUpperCase(l);
             }
             return null;

@@ -11,13 +11,15 @@
     <string name="title_section2">Electricity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="edit_reading_dialog_title">Edit Reading</string>
+    <string name="edit_reading_dialog_message">Change or remove the reading for a particular day</string>
     <string name="welcome_dialog_title">Welcome to BillPredict</string>
     <string name="welcome_dialog_message">Please set up the dates and readings of your previous cycles.\n
         If you do not set the dates, today\'s date will be considered as the last date of the cycles by default.\n
         In case you do not remember the last reading, then you must update the meter reading for two days,
         to start getting results.\n
         Once you\'re done, press back to return to the main screen</string>
-    <string name="monthly_notice">It's been 30 days since your cycle started.
+    <string name="monthly_notice">It\'s been 30 days since your cycle started.
         If it has ended, please update the settings</string>
     <string name="title_activity_help">Help</string>
     <string name="hello_world">Hello world!</string>

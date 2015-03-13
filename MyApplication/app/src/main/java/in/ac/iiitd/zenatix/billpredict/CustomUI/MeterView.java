@@ -30,6 +30,7 @@ public class MeterView extends View {
     //TargetColours
     private  int lowTargetColour,medTargetColour,highTargetColour;
     private float maxScale=100;
+    private float monthScale=100;
 
     public MeterView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -161,6 +162,10 @@ public class MeterView extends View {
         requestLayout();
     }
 
+    public void setMonthScale(float scale){
+        monthScale=scale;
+    }
+
     public void setTitle(String title){
         mTitle=title;
         invalidate();
@@ -232,7 +237,7 @@ public class MeterView extends View {
 
         canvas.drawText("PREDICTED CONSUMPTION "+"("+mUnit+")",mDrawingRect.centerX(),mDrawingRect.centerY()+(radius*0.66f),mRegularText);
         canvas.drawText("[MONTHLY]",mDrawingRect.centerX(),mDrawingRect.centerY()+(radius*0.75f),mRegularText);
-        valueString = Integer.toString((int)Math.floor((mTarget/100f)*maxScale));
+        valueString = Integer.toString((int)Math.floor((mTarget/100f)*monthScale));
         canvas.drawText(valueString,mDrawingRect.centerX(),mDrawingRect.centerY()+(radius*0.55f),mPredictText);
 
         canvas.drawText(mTitle,mDrawingRect.centerX(),mDrawingRect.centerY()+(radius*0.075f),mTitleText);

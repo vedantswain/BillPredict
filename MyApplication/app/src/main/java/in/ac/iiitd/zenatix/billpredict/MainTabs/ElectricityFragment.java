@@ -42,7 +42,7 @@ public class ElectricityFragment extends Fragment {
     EditText electricityEditText;
     Button electricityBtn;
     TextView electricityEstimate,billNote;
-    Float lastCycleReading= -1f,scale=600f;
+    Float lastCycleReading= -1f,scale=600f,monthScale=600f;
     int electricityCycleMonthNo=1;
     String lastCycleDate="";
 
@@ -103,6 +103,7 @@ public class ElectricityFragment extends Fragment {
         electricityMeterView.setTitle(getString(R.string.title_section2));
         scale=scale*electricityCycleMonthNo;
         electricityMeterView.setScale(scale);
+        electricityMeterView.setMonthScale(monthScale);
         electricityMeterView.setUnit("kWh");
 
         electricityEditText=(EditText)inflateView.findViewById((R.id.electricityEditText));
@@ -147,7 +148,7 @@ public class ElectricityFragment extends Fragment {
             if(consumption>=0) {
                 Float prediction = getPrediction(consumption);
                 electricityMeterView.setProgress((consumption / scale) * 100);
-                electricityMeterView.setTarget((prediction / (scale/electricityCycleMonthNo)) * 100);
+                electricityMeterView.setTarget((prediction / (monthScale)) * 100);
                 electricityEstimate.setText("Rs." + Integer.toString((int) getEstimate(prediction)));
             }
             else
@@ -173,7 +174,7 @@ public class ElectricityFragment extends Fragment {
 
             if(lastCycleReading>-1 && consumption>=0) {
                 electricityMeterView.setProgress((consumption / scale) * 100);
-                electricityMeterView.setTarget((mPrediction / (scale/electricityCycleMonthNo)) * 100);
+                electricityMeterView.setTarget((mPrediction / (monthScale)) * 100);
                 electricityEstimate.setText("Rs." + String.format("%.2f", getEstimate(mPrediction)));
             }
             else{

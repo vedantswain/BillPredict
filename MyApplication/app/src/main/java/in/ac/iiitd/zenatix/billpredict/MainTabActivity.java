@@ -54,7 +54,7 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
     private Intent reminderServiceIntent;
     private PendingIntent reminderServicePendingIntent;
     private AlarmManager reminderAlarmMgr;
-    private int waterCycleNo=1,electricityCycleNo=1;
+    private int waterCycleMonthNo=1,electricityCycleMonthNo=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +98,8 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
         setDefaultDates(); //In case the user hasn't set them up
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        waterCycleNo=sharedPref.getInt(SettingsActivity.WATER_CYCLE_MONTH_NO,1);
-        electricityCycleNo=sharedPref.getInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,1);
+        waterCycleMonthNo=sharedPref.getInt(SettingsActivity.WATER_CYCLE_MONTH_NO,1);
+        electricityCycleMonthNo=sharedPref.getInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,1);
         if(!sharedPref.getBoolean("OPENED_BEFORE",false))
             openSettings();
 
@@ -173,10 +173,10 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
             // getItem is called to instantiate the fragment for the given page.
             Fragment fragment=null;
             switch(position){
-                case 1:
+                case 0:
                     fragment=new ElectricityFragment();
                     break;
-                case 0:
+                case 1:
                     fragment=new WaterFragment();
                     break;
 
@@ -194,9 +194,9 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
         public CharSequence getPageTitle(int position) {
             Locale l = Locale.getDefault();
             switch (position) {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
                 case 1:
+                    return getString(R.string.title_section1).toUpperCase(l);
+                case 0:
                     return getString(R.string.title_section2).toUpperCase(l);
             }
             return null;
@@ -272,11 +272,11 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
 
             startDate = sdf.parse(sharedPref.getString(SettingsActivity.LAST_DATE_ELECTRICITY,""));
             float lastDateElectricity=(curDate.getTime()-startDate.getTime())/1000/60/60/24;
-            if(lastDateElectricity>=30*electricityCycleNo){
-                electricityCycleNo++;
-                SharedPreferences.Editor editor=sharedPref.edit();
-                editor.putInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,electricityCycleNo);
-                editor.commit();
+            electricityCycleMonthNo= ((int) (lastDateElectricity/30))+1;
+            SharedPreferences.Editor editor=sharedPref.edit();
+            editor.putInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,electricityCycleMonthNo);
+
+            if(lastDateElectricity==30*electricityCycleMonthNo){
                 openDialog("Electricity");
 //                SettingsFragment.setNextDate(sharedPref.getString(SettingsActivity.LAST_DATE_ELECTRICITY,"")
 //                        ,SettingsActivity.NEXT_DATE_ELECTRICITY,this);
@@ -288,11 +288,11 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
 
             startDate = sdf.parse(sharedPref.getString(SettingsActivity.LAST_DATE_WATER,""));
             float lastDateWater=(curDate.getTime()-startDate.getTime())/1000/60/60/24;
-            if(lastDateWater>=30*waterCycleNo){
-                waterCycleNo++;
-                SharedPreferences.Editor editor=sharedPref.edit();
-                editor.putInt(SettingsActivity.WATER_CYCLE_MONTH_NO,waterCycleNo);
-                editor.commit();
+            waterCycleMonthNo= ((int) (lastDateWater/30))+1;
+            editor.putInt(SettingsActivity.WATER_CYCLE_MONTH_NO,waterCycleMonthNo);
+            editor.commit();
+
+            if(lastDateWater==30*waterCycleMonthNo){
                 openDialog("Water");
 //                SettingsFragment.setNextDate(sharedPref.getString(SettingsActivity.LAST_DATE_WATER,"")
 //                        ,SettingsActivity.NEXT_DATE_WATER,this);
