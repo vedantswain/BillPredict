@@ -112,6 +112,14 @@ public class ElectricityHistoryFragment extends ListFragment {
             adapter=new HistoryArrayAdapter(getActivity(),list);
             setListAdapter(adapter);
         }
+
+        if(list.isEmpty()){
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage(R.string.no_data_dialog_message)
+                    .setTitle(R.string.no_data_dialog_title);
+        }
+
+        setListShown(true);
     }
 
     private void openDialog(final DbEntryObject entry) {

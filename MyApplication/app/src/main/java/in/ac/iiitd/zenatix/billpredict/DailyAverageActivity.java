@@ -1,10 +1,12 @@
 package in.ac.iiitd.zenatix.billpredict;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -15,6 +17,8 @@ import java.util.Locale;
 
 import in.ac.iiitd.zenatix.billpredict.AverageTabs.ElectricityAverageFragment;
 import in.ac.iiitd.zenatix.billpredict.AverageTabs.WaterAverageFragment;
+import in.ac.iiitd.zenatix.billpredict.MenuActivities.AboutActivity;
+import in.ac.iiitd.zenatix.billpredict.MenuActivities.HelpActivity;
 
 
 public class DailyAverageActivity extends ActionBarActivity implements ActionBar.TabListener {
@@ -38,6 +42,7 @@ public class DailyAverageActivity extends ActionBarActivity implements ActionBar
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_average);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -78,7 +83,7 @@ public class DailyAverageActivity extends ActionBarActivity implements ActionBar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_graph, menu);
+        getMenuInflater().inflate(R.menu.menu_daily_average, menu);
         return true;
     }
 
@@ -89,9 +94,20 @@ public class DailyAverageActivity extends ActionBarActivity implements ActionBar
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            case R.id.action_help:
+                openHelp();
+                return true;
+            case R.id.action_about:
+                openAbout();
+                return true;
+            case R.id.action_history:
+                openHistory();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -156,6 +172,26 @@ public class DailyAverageActivity extends ActionBarActivity implements ActionBar
             }
             return null;
         }
+    }
+
+    private void openSettings(){
+        Intent intent = new Intent(this,SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void openHelp(){
+        Intent intent = new Intent(this,HelpActivity.class);
+        startActivity(intent);
+    }
+
+    private void openHistory(){
+        Intent intent = new Intent(this,HistoryActivity.class);
+        startActivity(intent);
+    }
+
+    private void openAbout(){
+        Intent intent = new Intent(this,AboutActivity.class);
+        startActivity(intent);
     }
 
 }

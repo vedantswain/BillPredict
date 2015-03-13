@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import in.ac.iiitd.zenatix.billpredict.DailyAverageActivity;
 import in.ac.iiitd.zenatix.billpredict.HistoryActivity;
 import in.ac.iiitd.zenatix.billpredict.R;
 import in.ac.iiitd.zenatix.billpredict.SettingsActivity;
@@ -50,6 +51,9 @@ public class AboutActivity extends ActionBarActivity {
             case R.id.action_history:
                 openHistory();
                 return true;
+            case R.id.action_average:
+                openAverage();
+                return true;
 
         }
 
@@ -68,6 +72,11 @@ public class AboutActivity extends ActionBarActivity {
 
     private void openHistory(){
         Intent intent = new Intent(this,HistoryActivity.class);
+        startActivity(intent);
+    }
+
+    private void openAverage(){
+        Intent intent = new Intent(this,DailyAverageActivity.class);
         startActivity(intent);
     }
 }

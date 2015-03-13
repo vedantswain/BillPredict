@@ -114,6 +114,10 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.TabL
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
+        else if (id == R.id.action_average){
+            openAverage();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -223,6 +227,11 @@ public class HistoryActivity extends ActionBarActivity implements ActionBar.TabL
 
     private void openAbout(){
         Intent intent = new Intent(this,AboutActivity.class);
+        startActivity(intent);
+    }
+
+    private void openAverage(){
+        Intent intent = new Intent(this,DailyAverageActivity.class);
         startActivity(intent);
     }
 

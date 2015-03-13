@@ -62,6 +62,9 @@ public class SettingsActivity extends ActionBarActivity {
             case R.id.action_history:
                 openHistory();
                 return true;
+            case R.id.action_average:
+                openAverage();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -78,6 +81,11 @@ public class SettingsActivity extends ActionBarActivity {
 
     private void openHistory(){
         Intent intent = new Intent(this,HistoryActivity.class);
+        startActivity(intent);
+    }
+
+    private void openAverage(){
+        Intent intent = new Intent(this,DailyAverageActivity.class);
         startActivity(intent);
     }
 }

@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import in.ac.iiitd.zenatix.billpredict.DailyAverageActivity;
 import in.ac.iiitd.zenatix.billpredict.HistoryActivity;
 import in.ac.iiitd.zenatix.billpredict.R;
 import in.ac.iiitd.zenatix.billpredict.SettingsActivity;
@@ -23,7 +24,7 @@ import in.ac.iiitd.zenatix.billpredict.SettingsActivity;
 
 public class HelpActivity extends ActionBarActivity {
 
-    private static final int MAX_VIEWS = 5;
+    private static final int MAX_VIEWS = 7;
 
     ViewPager mViewPager;
 
@@ -73,6 +74,9 @@ public class HelpActivity extends ActionBarActivity {
             case R.id.action_history:
                 openHistory();
                 return true;
+            case R.id.action_average:
+                openAverage();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -89,6 +93,11 @@ public class HelpActivity extends ActionBarActivity {
 
     private void openHistory(){
         Intent intent = new Intent(this,HistoryActivity.class);
+        startActivity(intent);
+    }
+
+    private void openAverage(){
+        Intent intent = new Intent(this,DailyAverageActivity.class);
         startActivity(intent);
     }
 
@@ -117,21 +126,30 @@ public class HelpActivity extends ActionBarActivity {
                     break;
 
                 case 1:
-                    imageView.setImageResource(R.drawable.help_2);
+                    imageView.setImageResource(R.drawable.help_5);
                     break;
 
                 case 2:
-                    imageView.setImageResource(R.drawable.help_3);
+                    imageView.setImageResource(R.drawable.help_2);
                     break;
 
                 case 3:
-                    imageView.setImageResource(R.drawable.help_4);
+                    imageView.setImageResource(R.drawable.help_3);
                     break;
 
                 case 4:
-                    imageView.setImageResource(R.drawable.help_5);
+                    imageView.setImageResource(R.drawable.help_4);
                     break;
-            }
+
+                case 5:
+                    imageView.setImageResource(R.drawable.help_6);
+                    break;
+
+                case 6:
+                    imageView.setImageResource(R.drawable.help_7);
+                    break;
+
+                }
 
             ((ViewPager) container).addView(imageViewContainer, 0);
             return imageViewContainer;

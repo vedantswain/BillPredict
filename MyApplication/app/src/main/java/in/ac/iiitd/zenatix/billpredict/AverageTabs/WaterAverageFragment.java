@@ -2,6 +2,7 @@ package in.ac.iiitd.zenatix.billpredict.AverageTabs;
 
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -150,6 +151,11 @@ public class WaterAverageFragment extends Fragment {
                 cursor.moveToNext();
             }
         }
+        else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage(R.string.no_data_dialog_message)
+                    .setTitle(R.string.no_data_dialog_title);
+        }
     }
 
     public void getCycleEntries(){
@@ -199,7 +205,7 @@ public class WaterAverageFragment extends Fragment {
     public void setupRenderer(){
         XYSeriesRenderer renderer = new XYSeriesRenderer();
         renderer.setLineWidth(2);
-        renderer.setColor(Color.RED);
+        renderer.setColor(getResources().getColor(R.color.accent));
         renderer.setPointStyle(PointStyle.CIRCLE);
         renderer.setFillPoints(true);
 
@@ -232,7 +238,7 @@ public class WaterAverageFragment extends Fragment {
         mRenderer.setLabelsTextSize(val);
         mRenderer.setLegendTextSize(val);
         mRenderer.setAxisTitleTextSize(val);
-        mRenderer.setYTitle("Consumption (kWh)");
+        mRenderer.setYTitle("Consumption (kL)");
         mRenderer.setXTitle("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Time");
         mRenderer.setYLabelsAlign(Paint.Align.RIGHT);
         mRenderer.setChartTitle("Water Daily Average");
