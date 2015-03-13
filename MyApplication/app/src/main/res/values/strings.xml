@@ -29,12 +29,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_splash_screen">BillPredict</string>
     <string name="title_activity_about">About</string>
-    <string name="about_paragraph_1">This app is brought developed by Zenatix</string>
-    <string name="about_paragraph_2">This application is currently only useful for people living in Delhi</string>
+    <string name="about_paragraph_1">This app is developed by Zenatix</string>
+    <string name="about_paragraph_2">BillPredict is currently only useful for people living in Delhi</string>
     <string name="about_paragraph_3">Water tariff used (per unit): Rs 2.66 (0-10),Rs 3.99 (10-20),
         Rs 19.97 (20-30),Rs 33.28f (>30) \n
     Electricity tariff used (per unit): Rs 4 (0-200),Rs 5.45 (200-400),Rs 7.95 (>400)</string>
-    <string name="about_paragraph_4">We use linear interpolation of daily usage to calculate
+    <string name="about_paragraph_4">We use linear interpolation of your daily usage to calculate
         the predicted consumption and estimated bill</string>
     <string name="about_paragraph_5">Subsidies that are included for calculation of costs are as per
         the government order dated February 26 that gives up to 20 KL of water free for each connection
