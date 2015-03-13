@@ -45,6 +45,7 @@ public class WaterFragment extends Fragment {
     Float lastCycleReading= -1f,scale=30f,monthScale=30f;
     int waterCycleMonthNo=1;
     String lastCycleDate="";
+    long lastCycleID=-1;
 
     BillPredictDbHelper mDbHelper;
     // TODO: Rename parameter arguments, choose names that match
@@ -121,6 +122,10 @@ public class WaterFragment extends Fragment {
             lastCycleReading = Float.parseFloat(sharedPref.getString(SettingsActivity.LAST_CYCLE_END_READING_WATER, ""));
             if(!lastCycleDate.isEmpty())
                 insert(lastCycleReading,lastCycleDate);
+            if(getId(lastCycleDate)<0)
+                insert(lastCycleReading,lastCycleDate);
+
+            lastCycleID=getId(lastCycleDate);
         }
         catch(NumberFormatException e){
             e.printStackTrace();
@@ -200,6 +205,7 @@ public class WaterFragment extends Fragment {
         ContentValues values = new ContentValues();
         values.put(DatabaseContract.WaterEntry.METER_READING, meterReading);
         values.put(DatabaseContract.WaterEntry.READING_DATE, readingDate);
+        values.put(DatabaseContract.WaterEntry.CYCLE_START_ID, lastCycleID);
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor=sharedPref.edit();

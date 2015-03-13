@@ -56,6 +56,7 @@ public class ElectricityFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private String TAG="ElectricityFragment";
+    private long lastCycleID=-1;
 
 
     /**
@@ -122,6 +123,10 @@ public class ElectricityFragment extends Fragment {
             lastCycleReading = Float.parseFloat(sharedPref.getString(SettingsActivity.LAST_CYCLE_END_READING_ELECTRICITY, ""));
             if(!lastCycleDate.isEmpty())
                 insert(lastCycleReading,lastCycleDate);
+            if(getId(lastCycleDate)<0)
+                insert(lastCycleReading,lastCycleDate);
+
+            lastCycleID=getId(lastCycleDate);
         }
         catch(NumberFormatException e){
             e.printStackTrace();
@@ -200,6 +205,7 @@ public class ElectricityFragment extends Fragment {
         ContentValues values = new ContentValues();
         values.put(DatabaseContract.ElectricityEntry.METER_READING, meterReading);
         values.put(DatabaseContract.ElectricityEntry.READING_DATE, readingDate);
+        values.put(DatabaseContract.ElectricityEntry.CYCLE_START_ID, lastCycleID);
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor=sharedPref.edit();
