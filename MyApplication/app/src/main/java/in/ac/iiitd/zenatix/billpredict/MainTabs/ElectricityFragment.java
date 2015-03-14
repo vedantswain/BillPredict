@@ -95,9 +95,7 @@ public class ElectricityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        electricityCycleMonthNo=sharedPref.getInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,1);
-        // Inflate the layout for this fragment
+       // Inflate the layout for this fragment
        View inflateView=inflater.inflate(R.layout.fragment_electricity, container, false);
 
         electricityMeterView=(MeterView)inflateView.findViewById(R.id.electricityMeterView);
@@ -118,6 +116,16 @@ public class ElectricityFragment extends Fragment {
             }
         });
 
+        return inflateView;
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        electricityCycleMonthNo=sharedPref.getInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,1);
+
         lastCycleDate=sharedPref.getString(SettingsActivity.LAST_DATE_ELECTRICITY,"");
         try {
             lastCycleReading = Float.parseFloat(sharedPref.getString(SettingsActivity.LAST_CYCLE_END_READING_ELECTRICITY, ""));
@@ -135,8 +143,6 @@ public class ElectricityFragment extends Fragment {
             if(lastCycleReading>-1)
                 setStoredReading();
         }
-
-        return inflateView;
     }
 
     private void setStoredReading(){

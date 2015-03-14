@@ -94,8 +94,6 @@ public class WaterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        waterCycleMonthNo=sharedPref.getInt(SettingsActivity.WATER_CYCLE_MONTH_NO,1);
         // Inflate the layout for this fragment
         View inflateView=inflater.inflate(R.layout.fragment_water, container, false);
 
@@ -117,6 +115,17 @@ public class WaterFragment extends Fragment {
             }
         });
 
+        return inflateView;
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        waterCycleMonthNo=sharedPref.getInt(SettingsActivity.WATER_CYCLE_MONTH_NO,1);
+
         lastCycleDate=sharedPref.getString(SettingsActivity.LAST_DATE_WATER,"");
         try {
             lastCycleReading = Float.parseFloat(sharedPref.getString(SettingsActivity.LAST_CYCLE_END_READING_WATER, ""));
@@ -135,7 +144,6 @@ public class WaterFragment extends Fragment {
                 setStoredReading();
         }
 
-        return inflateView;
     }
 
     private void setStoredReading(){
