@@ -293,6 +293,7 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
             startDate = sdf.parse(sharedPref.getString(SettingsActivity.LAST_DATE_WATER,""));
             float lastDateWater=(curDate.getTime()-startDate.getTime())/1000/60/60/24;
             waterCycleMonthNo= ((int) (lastDateWater/30))+1;
+//            Log.v(TAG,lastDateWater+" days and "+waterCycleMonthNo+" months");
             editor.putInt(SettingsActivity.WATER_CYCLE_MONTH_NO,waterCycleMonthNo);
             editor.commit();
 

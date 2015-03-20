@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -129,7 +130,7 @@ public class ElectricityAverageFragment extends Fragment {
                 long id=cursor.getLong(0);
                 Float reading = cursor.getFloat(1);
                 String date = cursor.getString(2);
-//                Log.v(TAG,"Reading entry: "+id+", "+reading+", "+date);
+                Log.v(TAG, "Reading entry: " + id + ", " + reading + ", " + date);
 
                 //Daily average is calculated and added to series
                 try {
@@ -255,7 +256,7 @@ public class ElectricityAverageFragment extends Fragment {
         final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
         dataset.addSeries(mSeries);
 
-        //Log.v(TAG,""+mSeries.getMaxY()+" "+mSeries.getMinY());
+        Log.v(TAG,""+mSeries.getMaxY()+" "+mSeries.getMinY());
 
         mRenderer.setYAxisMax(mSeries.getMaxY()+(0.25*mSeries.getMaxY()));
         mRenderer.setXAxisMax(mSeries.getMaxX()+(0.0001*mSeries.getMaxX()));

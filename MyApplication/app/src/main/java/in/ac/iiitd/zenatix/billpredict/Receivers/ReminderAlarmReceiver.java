@@ -75,13 +75,13 @@ public class ReminderAlarmReceiver extends BroadcastReceiver {
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Reminder")
                         .setContentText(message)
+                        .setAutoCancel(true)
                         .setContentIntent(pIntent);
         //Vibration
         mBuilder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
 
         //LED
         mBuilder.setLights(Color.WHITE, 3000, 3000);
-
 
         NotificationManager mNotifyMgr =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

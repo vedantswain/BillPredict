@@ -100,9 +100,6 @@ public class ElectricityFragment extends Fragment {
 
         electricityMeterView=(MeterView)inflateView.findViewById(R.id.electricityMeterView);
         electricityMeterView.setTitle(getString(R.string.title_section2));
-        scale=scale*electricityCycleMonthNo;
-        electricityMeterView.setScale(scale);
-        electricityMeterView.setMonthScale(monthScale);
         electricityMeterView.setUnit("kWh");
 
         electricityEditText=(EditText)inflateView.findViewById((R.id.electricityEditText));
@@ -125,6 +122,11 @@ public class ElectricityFragment extends Fragment {
         super.onResume();
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         electricityCycleMonthNo=sharedPref.getInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,1);
+
+        scale=scale*electricityCycleMonthNo;
+
+        electricityMeterView.setScale(scale);
+        electricityMeterView.setMonthScale(monthScale);
 
         lastCycleDate=sharedPref.getString(SettingsActivity.LAST_DATE_ELECTRICITY,"");
         try {

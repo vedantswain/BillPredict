@@ -99,9 +99,6 @@ public class WaterFragment extends Fragment {
 
         waterMeterView=(MeterView)inflateView.findViewById(R.id.waterMeterView);
         waterMeterView.setTitle(getString(R.string.title_section1));
-        scale=scale*waterCycleMonthNo;
-        waterMeterView.setScale(scale);
-        waterMeterView.setMonthScale(monthScale);
         waterMeterView.setUnit("kL");
 
         waterEditText=(EditText)inflateView.findViewById((R.id.waterEditText));
@@ -125,6 +122,10 @@ public class WaterFragment extends Fragment {
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         waterCycleMonthNo=sharedPref.getInt(SettingsActivity.WATER_CYCLE_MONTH_NO,1);
+        scale=scale*waterCycleMonthNo;
+
+        waterMeterView.setScale(scale);
+        waterMeterView.setMonthScale(monthScale);
 
         lastCycleDate=sharedPref.getString(SettingsActivity.LAST_DATE_WATER,"");
         try {
