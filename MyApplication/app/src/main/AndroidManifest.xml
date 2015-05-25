@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="in.ac.iiitd.zenatix.billpredict" >
+    package="com.app.android.zenatix.billpredict" >
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
-
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -13,35 +13,39 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainTabActivity"
-            android:label="@string/title_activity_main_tab" >
+            android:name="com.app.android.zenatix.billpredict.MainTabActivity"
+            android:label="@string/title_activity_main_tab"
+            android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.app.android.zenatix.billpredict.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainTabActivity" >
+            android:parentActivityName="com.app.android.zenatix.billpredict.MainTabActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="in.ac.iiitd.zenatix.billpredict.MainTabActivity" />
+                android:value="com.app.android.zenatix.billpredict.MainTabActivity" />
         </activity>
 
         <receiver
-            android:name=".Receivers.ReminderAlarmReceiver"
+            android:name="com.app.android.zenatix.billpredict.Receivers.ReminderAlarmReceiver"
             android:enabled="true"
             android:exported="true" >
         </receiver>
 
         <activity
-            android:name=".MenuActivities.HelpActivity"
+            android:name="com.app.android.zenatix.billpredict.MenuActivities.HelpActivity"
             android:label="@string/title_activity_help"
-            android:parentActivityName=".MainTabActivity" >
+            android:parentActivityName="com.app.android.zenatix.billpredict.MainTabActivity"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="in.ac.iiitd.zenatix.billpredict.MainTabActivity" />
+                android:value="com.app.android.zenatix.billpredict.MainTabActivity" />
         </activity>
         <activity
-            android:name=".SplashScreenActivity"
-            android:label="@string/title_activity_splash_screen" >
+            android:name="com.app.android.zenatix.billpredict.SplashScreenActivity"
+            android:label="@string/title_activity_splash_screen"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,15 +53,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MenuActivities.AboutActivity"
-            android:label="@string/title_activity_about" >
+            android:name="com.app.android.zenatix.billpredict.MenuActivities.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="in.ac.iiitd.zenatix.billpredict.MainTabActivity" />
+                android:value="com.app.android.zenatix.billpredict.MainTabActivity" />
         </activity>
 
         <receiver
-            android:name=".Receivers.BootReceiver"
+            android:name="com.app.android.zenatix.billpredict.Receivers.BootReceiver"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
@@ -66,24 +71,32 @@
         </receiver>
 
         <activity
-            android:name=".HistoryActivity"
+            android:name="com.app.android.zenatix.billpredict.HistoryActivity"
             android:label="@string/title_activity_history"
-            android:parentActivityName=".MainTabActivity" >
+            android:parentActivityName="com.app.android.zenatix.billpredict.MainTabActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="in.ac.iiitd.zenatix.billpredict.MainTabActivity" />
+                android:value="com.app.android.zenatix.billpredict.MainTabActivity" />
         </activity>
         <activity
-            android:name=".DailyAverageActivity"
+            android:name="com.app.android.zenatix.billpredict.DailyAverageActivity"
             android:label="@string/title_activity_graph"
-            android:parentActivityName=".MainTabActivity" >
+            android:parentActivityName="com.app.android.zenatix.billpredict.MainTabActivity"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="in.ac.iiitd.zenatix.billpredict.MainTabActivity" />
+                android:value="com.app.android.zenatix.billpredict.MainTabActivity" />
         </activity>
+
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="dce86a0295afcc52a5bafc956c09b77700d85b06" />
+
+        <service
+            android:name="com.app.android.zenatix.billpredict.ReminderIntentService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

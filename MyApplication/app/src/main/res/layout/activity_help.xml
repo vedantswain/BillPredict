@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="in.ac.iiitd.zenatix.billpredict.MenuActivities.HelpActivity"
+    tools:context="com.app.android.zenatix.billpredict.MenuActivities.HelpActivity"
     android:background="@color/primaryDark">
 
     <android.support.v4.view.ViewPager
@@ -10,7 +10,7 @@
         android:layout_height="fill_parent"
      />
 
-    <!--  This TextView will not swipe when you swipe in the ViewPager -->
+    <!--  This TextView will not swipe when you swipe com the ViewPager -->
 
     <TextView
         android:id="@+id/Title"

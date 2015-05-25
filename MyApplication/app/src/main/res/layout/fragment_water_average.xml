@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="in.ac.iiitd.zenatix.billpredict.AverageTabs.WaterAverageFragment"
+    tools:context="com.app.android.zenatix.billpredict.AverageTabs.WaterAverageFragment"
     android:id="@+id/eAverageLayout">
 
     <!-- TODO: Update blank fragment layout -->

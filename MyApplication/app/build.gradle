@@ -20,7 +20,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "in.ac.iiitd.zenatix.billpredict"
+        applicationId "com.app.android.zenatix.billpredict"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1

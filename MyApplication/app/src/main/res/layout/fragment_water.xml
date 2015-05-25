@@ -1,9 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="in.ac.iiitd.zenatix.billpredict.MainTabs.WaterFragment">
+    tools:context="com.app.android.zenatix.billpredict.MainTabs.WaterFragment">
 
-    <in.ac.iiitd.zenatix.billpredict.CustomUI.MeterView
+    <com.app.android.zenatix.billpredict.CustomUI.MeterView
         android:layout_width="400dp"
         android:layout_height="400dp"
         android:id="@+id/waterMeterView"
