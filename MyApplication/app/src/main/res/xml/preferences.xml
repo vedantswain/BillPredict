@@ -16,6 +16,19 @@
             android:summary="Set the final water meter reading from your previous cycle"
             android:inputType="number"
             android:dialogTitle="Previous Cycle End Reading (Water)" />
+        <ListPreference
+            android:title="Select your provider"
+            android:key="SERVICE_PROVIDER_WATER"
+            android:defaultValue="1"
+            android:entries="@array/waterProviders"
+            android:entryValues="@array/waterProviderValues" />
+        <EditTextPreference
+            android:key="CUSTOMER_NO_WATER"
+            android:title="Customer Number"
+            android:summary="Enter your customer number for your water provider"
+            android:inputType="text"
+            android:dialogTitle="Customer Number (Water)" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -34,5 +47,18 @@
             android:summary="Set the final electricity meter reading from your previous cycle"
             android:inputType="number"
             android:dialogTitle="Previous Cycle End Reading (Electricity)" />
+        <ListPreference
+            android:title="Select your provider"
+            android:key="SERVICE_PROVIDER_ELECTRICITY"
+            android:defaultValue="1"
+            android:entries="@array/waterProviders"
+            android:entryValues="@array/waterProviderValues" />
+        <EditTextPreference
+            android:key="CUSTOMER_NO_ELECTRICITY"
+            android:title="Customer Number"
+            android:summary="Enter your customer number for your electricity provider"
+            android:inputType="text"
+            android:dialogTitle="Customer Number (Electricity)" />
+
     </PreferenceCategory>
 </PreferenceScreen>

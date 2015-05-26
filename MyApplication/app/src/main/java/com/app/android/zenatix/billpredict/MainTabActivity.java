@@ -20,11 +20,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import android.widget.Toast;
 
 import com.app.android.zenatix.billpredict.Database.BillPredictDbHelper;
 import com.app.android.zenatix.billpredict.MainTabs.ElectricityFragment;
@@ -32,9 +28,16 @@ import com.app.android.zenatix.billpredict.MainTabs.WaterFragment;
 import com.app.android.zenatix.billpredict.MenuActivities.AboutActivity;
 import com.app.android.zenatix.billpredict.MenuActivities.HelpActivity;
 import com.app.android.zenatix.billpredict.Receivers.ReminderAlarmReceiver;
+import com.app.android.zenatix.billpredict.RequestTasks.RegisterTask;
+import com.app.android.zenatix.billpredict.TaskCompletedListeners.RegisterCompleteListener;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
-public class MainTabActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class MainTabActivity extends ActionBarActivity implements ActionBar.TabListener, RegisterCompleteListener {
 
     private static final String TAG = "MainActivity";
     /**
@@ -103,6 +106,9 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
         if(!sharedPref.getBoolean("OPENED_BEFORE",false))
             openSettings();
 
+        if(!sharedPref.getBoolean("REGISTERED_CUSTOMER",false))
+            registerCustomer();
+
         setReminderAlarm(); //Set's alarm to remind user of to update reading
         resetCycle();   //Resets cycles and clears DB every 30 days
     }
@@ -162,6 +168,17 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    @Override
+    public void onRegisterComplete(String msg) {
+        if(msg.contains("success")){
+            Toast.makeText(this,"Registered",Toast.LENGTH_SHORT);
+            SharedPreferences sharedPref=PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor=sharedPref.edit();
+            editor.putBoolean("REGISTERED_CUSTOMER", true);
+            editor.commit();
+        }
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -204,6 +221,22 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
                     return getString(R.string.title_section2).toUpperCase(l);
             }
             return null;
+        }
+    }
+
+    private void registerCustomer(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String cno_water=sharedPref.getString(SettingsActivity.CUSTOMER_NO_WATER, "");
+        String cno_electricity=sharedPref.getString(SettingsActivity.CUSTOMER_NO_ELECTRICITY,"");
+        String service_water=sharedPref.getString(SettingsActivity.SERVICE_PROVIDER_WATER,"");
+        String service_electricity=sharedPref.getString(SettingsActivity.SERVICE_PROVIDER_ELECTRICITY,"");
+
+        if(cno_water.isEmpty() || cno_electricity.isEmpty() ||
+                service_electricity.isEmpty() ||service_water.isEmpty()){
+            Toast.makeText(this,"Fill in customer details in settings",Toast.LENGTH_SHORT);
+        }
+        else {
+            (new RegisterTask(cno_water, service_water, cno_electricity, service_electricity, this)).execute();
         }
     }
 

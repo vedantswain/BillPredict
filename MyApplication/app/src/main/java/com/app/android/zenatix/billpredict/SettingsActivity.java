@@ -20,6 +20,10 @@ public class SettingsActivity extends ActionBarActivity {
     public static final String LAST_CYCLE_END_READING_ELECTRICITY="LAST_CYCLE_END_READING_ELECTRICITY";
     public static final String LAST_DATE_WATER="LAST_DATE_WATER";
     public static final String LAST_DATE_ELECTRICITY="LAST_DATE_ELECTRICITY";
+    public static final String SERVICE_PROVIDER_WATER="SERVICE_PROVIDER_WATER";
+    public static final String SERVICE_PROVIDER_ELECTRICITY="SERVICE_PROVIDER_ELECTRICITY";
+    public static final String CUSTOMER_NO_WATER="CUSTOMER_NO_WATER";
+    public static final String CUSTOMER_NO_ELECTRICITY="CUSTOMER_NO_ELECTRICITY";
 //    public static final String NEXT_DATE_WATER="NEXT_DATE_WATER";
 //    public static final String NEXT_DATE_ELECTRICITY="NEXT_DATE_ELECTRICITY";
     public static final float CYCLE_LENGTH =30f;
