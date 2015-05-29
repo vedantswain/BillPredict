@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="waterProviders">
+        <item>red</item>
+        <item>green</item>
+        <item>blue</item>
+    </string-array>
+
+    <string-array name="waterProviderValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="electrictyProviders">
+        <item>orange</item>
+        <item>purple</item>
+        <item>black</item>
+    </string-array>
+
+    <string-array name="electricityProviderValues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+</resources>
