@@ -27,9 +27,46 @@ def store_user(request):
 	customerEntry.save()
 
 @csrf_exempt
+def update_cycle(request):
+    if request.method == 'PUT':
+    	return update_cycle_data(request)
+    else:
+    	return HttpResponse(status=405)
+
+def update_cycle_data(request):
+	# print(request.body)
+	json_data=json.loads(request.body)
+	if(json_data.get('type')=="water"):
+		return update_cycle_water(json_data,json_data.get('customer_no'))
+	elif(json_data.get('type')=="electricity"):
+		return update_cycle_electricity(json_data,json_data.get('customer_no'))
+
+	return HttpResponse(status=400)
+
+def update_cycle_water(entry,cno):
+	response = "Updated water cycle data successfully"
+	try:
+		customer=CustomerProfile.objects.get(customer_no_water=cno)
+	except CustomerProfile.DoesNotExist:
+		return HttpResponse(status=400)
+	Water.objects.filter(customer=customer,cycle_start_reading=entry.get('old_cycle_reading')).update(cycle_start_reading=entry.get('new_cycle_reading'))
+	return HttpResponse(response)
+
+def update_cycle_electricity(entry,cno):
+	response = "Updated electricity cycle data successfully"
+	try:
+		customer=CustomerProfile.objects.get(customer_no_electricity=cno)
+	except CustomerProfile.DoesNotExist:
+		return HttpResponse(status=400)
+	Electricity.objects.filter(customer=customer,cycle_start_reading=entry.get('old_cycle_reading')).update(cycle_start_reading=entry.get('new_cycle_reading'))
+	return HttpResponse(response)
+
+@csrf_exempt
 def store(request):
     if request.method == 'POST':
         return store_data(request)
+    elif request.method == 'PUT':
+    	return update_data(request)
     else:
        return HttpResponse(status=405)
 
@@ -76,6 +113,50 @@ def store_electricity(entry,cno):
 		reading_date = reading_date,cycle_start_reading = entry.get('cycle_start_reading'),
 		cycle_start_date = cs_date,location = entry.get('location')	)
 	electricityEntry.save()
+
+	return HttpResponse(response)
+
+def update_data(request):
+	# print(request.body)
+	json_data=json.loads(request.body)
+	if(json_data.get('type')=="water"):
+		return update_water(json_data,json_data.get('customer_no'))
+	elif(json_data.get('type')=="electricity"):
+		return update_electricity(json_data,json_data.get('customer_no'))
+
+	return HttpResponse(status=400)
+
+def update_water(entry,cno):
+	response = "Updated water data successfully"
+	print(entry)
+	try:
+		customer=CustomerProfile.objects.get(customer_no_water=cno)
+		old_entry=Water.objects.get(customer=customer,meter_reading=entry.get('old_reading'))
+	except CustomerProfile.DoesNotExist:
+		return HttpResponse(status=400)
+	except Water.DoesNotExist:
+		return HttpResponse(status=400)
+
+	# print(entry.get('reading_date'))
+	old_entry.meter_reading=entry.get('new_reading')
+	old_entry.save()
+
+	return HttpResponse(response)
+
+def update_water(entry,cno):
+	response = "Updated electricity data successfully"
+	print(entry)
+	try:
+		customer=CustomerProfile.objects.get(customer_no_electricity=cno)
+		old_entry=Electricity.objects.get(customer=customer,meter_reading=entry.get('old_reading'))
+	except CustomerProfile.DoesNotExist:
+		return HttpResponse(status=400)
+	except Electricity.DoesNotExist:
+		return HttpResponse(status=400)
+
+	# print(entry.get('reading_date'))
+	old_entry.meter_reading=entry.get('new_reading')
+	old_entry.save()
 
 	return HttpResponse(response)
 
