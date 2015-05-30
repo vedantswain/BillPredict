@@ -5,36 +5,48 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import com.app.android.zenatix.billpredict.CustomUI.HistoryArrayAdapter;
 import com.app.android.zenatix.billpredict.Database.BillPredictDbHelper;
 import com.app.android.zenatix.billpredict.Database.DatabaseContract;
 import com.app.android.zenatix.billpredict.Database.DbEntryObject;
 import com.app.android.zenatix.billpredict.R;
+import com.app.android.zenatix.billpredict.RequestTasks.DeleteTask;
+import com.app.android.zenatix.billpredict.RequestTasks.UpdateCycleTask;
+import com.app.android.zenatix.billpredict.RequestTasks.UpdateTask;
+import com.app.android.zenatix.billpredict.SettingsActivity;
+import com.app.android.zenatix.billpredict.TaskCompletedListeners.DeleteCompleteListener;
+import com.app.android.zenatix.billpredict.TaskCompletedListeners.UpdateCompleteListener;
+import com.app.android.zenatix.billpredict.TaskCompletedListeners.UpdateCycleCompleteListener;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ElectricityHistoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ElectricityHistoryFragment extends ListFragment {
+public class ElectricityHistoryFragment extends ListFragment
+        implements DeleteCompleteListener,UpdateCompleteListener,UpdateCycleCompleteListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String TYPE ="electricity" ;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -221,6 +233,14 @@ public class ElectricityHistoryFragment extends ListFragment {
         String selection = DatabaseContract.ElectricityEntry._ID + " LIKE ?";
         String[] selectionArgs = { String.valueOf(rowId) };
 
+
+        if(isCycleID(rowId)){
+            updateCycleOnBackend(rowId,meterReading);
+        }
+        else{
+            updateOnBackend(rowId,meterReading);
+        }
+
         int count = db.update(
                 DatabaseContract.ElectricityEntry.TABLE_NAME,
                 values,
@@ -233,9 +253,107 @@ public class ElectricityHistoryFragment extends ListFragment {
             return -1;
     }
 
+    public void updateOnBackend(long rowId,float meterReading){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String cno_electricity=sharedPref.getString(SettingsActivity.CUSTOMER_NO_ELECTRICITY, "");
+
+        (new UpdateTask(cno_electricity,TYPE,getMeterReading(rowId),meterReading,this)).execute();
+    }
+
+    public void updateCycleOnBackend(long rowId,float meterReading){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String cno_electricity=sharedPref.getString(SettingsActivity.CUSTOMER_NO_ELECTRICITY, "");
+
+        (new UpdateCycleTask(cno_electricity,TYPE,getMeterReading(rowId),meterReading,this)).execute();
+    }
+
     public boolean delete(long rowId){
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        return db.delete(DatabaseContract.ElectricityEntry.TABLE_NAME,
-                DatabaseContract.ElectricityEntry._ID + "=" + rowId, null) > 0;
+        if(isCycleID(rowId)) {
+            Toast.makeText(getActivity(),"Cycle start cannot be deleted",Toast.LENGTH_LONG).show();
+            return false;
+        }
+        else {
+            deleteOnBackend(rowId);
+            return db.delete(DatabaseContract.ElectricityEntry.TABLE_NAME,
+                    DatabaseContract.ElectricityEntry._ID + "=" + rowId, null) > 0;
+        }
+    }
+
+    public void deleteOnBackend(long rowId){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String cno_electricity=sharedPref.getString(SettingsActivity.CUSTOMER_NO_ELECTRICITY, "");
+
+        (new DeleteTask(cno_electricity,TYPE,getMeterReading(rowId),this)).execute();
+    }
+
+    public float getMeterReading(long rowId){
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String[] projection = {
+                DatabaseContract.ElectricityEntry.METER_READING,
+        };
+        String selection = DatabaseContract.ElectricityEntry._ID+"=?";
+        String[] selectionArgs = {
+                String.valueOf(rowId),
+        };
+
+        Cursor c = db.query(
+                DatabaseContract.ElectricityEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        c.moveToFirst();
+        return c.getFloat(c.getColumnIndexOrThrow(DatabaseContract.ElectricityEntry.METER_READING));
+    }
+
+    public boolean isCycleID(long rowId){
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String[] projection = {
+                DatabaseContract.ElectricityEntry.CYCLE_START_ID,
+        };
+        String selection = DatabaseContract.ElectricityEntry._ID+"=?";
+        String[] selectionArgs = {
+                String.valueOf(rowId),
+        };
+
+        Cursor c = db.query(
+                DatabaseContract.ElectricityEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        c.moveToFirst();
+        long itemId = c.getLong(c.getColumnIndexOrThrow(DatabaseContract.ElectricityEntry.CYCLE_START_ID));
+
+        Log.v(TAG, "Select: " + itemId);
+
+        if(itemId==-1)
+            return true;
+        else
+            return false;
+    }
+
+    @Override
+    public void onDeleteComplete(String msg) {
+        Log.v(TAG,msg);
+    }
+
+    @Override
+    public void onUpdateComplete(String msg) {
+        Log.v(TAG,msg);
+    }
+
+    @Override
+    public void onUpdateCycleComplete(String msg) {
+        Log.v(TAG,msg);
     }
 }

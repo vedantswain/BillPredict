@@ -7,5 +7,7 @@ public class CommonUtils {
     public final static String API="http://192.168.1.3:8000/billpredict/";
     public final static String REGISTER_API=API+"register/";
     public final static String STORE_API=API+"store/";
-    public final static String HISTORY_API=API+"history-story/";
+    public final static String DELETE_API=API+"delete/";
+    public final static String HISTORY_API=API+"history-store/";
+    public final static String UPDATE_CYCLE_API=API+"update-cycle/";
 }

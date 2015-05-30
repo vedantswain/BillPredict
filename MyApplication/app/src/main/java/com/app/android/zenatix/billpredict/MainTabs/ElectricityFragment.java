@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -21,15 +22,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.android.zenatix.billpredict.CustomUI.MeterView;
+import com.app.android.zenatix.billpredict.Database.BillPredictDbHelper;
+import com.app.android.zenatix.billpredict.Database.DatabaseContract;
+import com.app.android.zenatix.billpredict.R;
+import com.app.android.zenatix.billpredict.RequestTasks.StoreTask;
+import com.app.android.zenatix.billpredict.SettingsActivity;
+import com.app.android.zenatix.billpredict.TaskCompletedListeners.StoreCompleteListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import com.app.android.zenatix.billpredict.Database.BillPredictDbHelper;
-import com.app.android.zenatix.billpredict.Database.DatabaseContract;
-import com.app.android.zenatix.billpredict.CustomUI.MeterView;
-import com.app.android.zenatix.billpredict.R;
-import com.app.android.zenatix.billpredict.SettingsActivity;
 
 
 /**
@@ -37,7 +43,8 @@ import com.app.android.zenatix.billpredict.SettingsActivity;
  * Use the {@link ElectricityFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ElectricityFragment extends Fragment {
+public class ElectricityFragment extends Fragment implements StoreCompleteListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     MeterView electricityMeterView;
     EditText electricityEditText;
     Button electricityBtn;
@@ -57,6 +64,10 @@ public class ElectricityFragment extends Fragment {
     private String mParam2;
     private String TAG="ElectricityFragment";
     private long lastCycleID=-1;
+    private GoogleApiClient mGoogleApiClient;
+    private String location;
+    private final String TYPE="electricity";
+
 
 
     /**
@@ -90,6 +101,27 @@ public class ElectricityFragment extends Fragment {
         }
 
         mDbHelper = new BillPredictDbHelper(getActivity());
+        buildGoogleApiClient();
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        Log.v(TAG,"Building api");
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    public void setupLocation(){
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        Log.v(TAG,"finding location");
+        if (mLastLocation != null) {
+            Log.v(TAG,"last location");
+            location=String.valueOf(mLastLocation.getLatitude())+","+String.valueOf(mLastLocation.getLongitude());
+            storeReading(lastCycleReading, lastCycleDate);
+        }
     }
 
     @Override
@@ -116,10 +148,20 @@ public class ElectricityFragment extends Fragment {
         return inflateView;
     }
 
+
+    @Override
+    public void onPause(){
+        super.onResume();
+        mGoogleApiClient.disconnect();
+    }
+
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
+
+        mGoogleApiClient.connect();
+
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         electricityCycleMonthNo=sharedPref.getInt(SettingsActivity.ELECTRICITY_CYCLE_MONTH_NO,1);
 
@@ -131,10 +173,12 @@ public class ElectricityFragment extends Fragment {
         lastCycleDate=sharedPref.getString(SettingsActivity.LAST_DATE_ELECTRICITY,"");
         try {
             lastCycleReading = Float.parseFloat(sharedPref.getString(SettingsActivity.LAST_CYCLE_END_READING_ELECTRICITY, ""));
-            if(!lastCycleDate.isEmpty())
-                insert(lastCycleReading,lastCycleDate);
-            if(getId(lastCycleDate)<0)
-                insert(lastCycleReading,lastCycleDate);
+            if(!lastCycleDate.isEmpty()) {
+                insert(lastCycleReading, lastCycleDate);
+            }
+            if(getId(lastCycleDate)<0) {
+                insert(lastCycleReading, lastCycleDate);
+            }
 
             lastCycleID=getId(lastCycleDate);
         }
@@ -180,8 +224,10 @@ public class ElectricityFragment extends Fragment {
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
             String date=sdf.format(curDate);
 
-            if(consumption>=0)
-                insert(mReading,date);
+            if(consumption>=0) {
+                storeReading(mReading, date);
+                insert(mReading, date);
+            }
 
             float mPrediction=getPrediction(consumption);
 
@@ -204,6 +250,17 @@ public class ElectricityFragment extends Fragment {
             }
     }
 
+    private void storeReading(float mReading,String date){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String cno_electricity=sharedPref.getString(SettingsActivity.CUSTOMER_NO_ELECTRICITY, "");
+
+        if(cno_electricity.isEmpty()){
+            Toast.makeText(getActivity(),"Fill in customer details in settings",Toast.LENGTH_SHORT);
+        }
+        else {
+            (new StoreTask(cno_electricity, TYPE, mReading, date, lastCycleReading, lastCycleDate, location,this)).execute();
+        }
+    }
 
     public long insert(float meterReading,String readingDate){
         // Gets the data repository com write mode
@@ -353,5 +410,25 @@ public class ElectricityFragment extends Fragment {
         // 3. Get the AlertDialog from create()
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        setupLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onStoreComplete(String msg) {
+
     }
 }

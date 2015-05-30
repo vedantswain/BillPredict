@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -23,13 +25,24 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.app.android.zenatix.billpredict.Database.BillPredictDbHelper;
+import com.app.android.zenatix.billpredict.Database.DatabaseContract;
 import com.app.android.zenatix.billpredict.MainTabs.ElectricityFragment;
 import com.app.android.zenatix.billpredict.MainTabs.WaterFragment;
 import com.app.android.zenatix.billpredict.MenuActivities.AboutActivity;
 import com.app.android.zenatix.billpredict.MenuActivities.HelpActivity;
 import com.app.android.zenatix.billpredict.Receivers.ReminderAlarmReceiver;
+import com.app.android.zenatix.billpredict.RequestTasks.HistoryTask;
 import com.app.android.zenatix.billpredict.RequestTasks.RegisterTask;
+import com.app.android.zenatix.billpredict.TaskCompletedListeners.HistoryCompleteListener;
 import com.app.android.zenatix.billpredict.TaskCompletedListeners.RegisterCompleteListener;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +50,9 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class MainTabActivity extends ActionBarActivity implements ActionBar.TabListener, RegisterCompleteListener {
+public class MainTabActivity extends ActionBarActivity
+        implements ActionBar.TabListener, RegisterCompleteListener, HistoryCompleteListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
     /**
@@ -59,10 +74,18 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
     private AlarmManager reminderAlarmMgr;
     private int waterCycleMonthNo=1,electricityCycleMonthNo=1;
 
+    static final int REQUEST_CODE_RECOVER_PLAY_SERVICES = 1001;
+    private GoogleApiClient mGoogleApiClient;
+    private BillPredictDbHelper mDbHelper;
+    private String location;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_tab);
+
+        mDbHelper=new BillPredictDbHelper(this);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -109,8 +132,218 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
         if(!sharedPref.getBoolean("REGISTERED_CUSTOMER",false))
             registerCustomer();
 
+        checkPlayServices();
+
+        buildGoogleApiClient();
+
         setReminderAlarm(); //Set's alarm to remind user of to update reading
         resetCycle();   //Resets cycles and clears DB every 30 days
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        mGoogleApiClient.disconnect();
+    }
+
+    private void checkHistory() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+
+//        if(!sharedPref.getBoolean("HISTORY_CUSTOMER",false))
+            storeHistory();
+
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        Log.v(TAG,"Building api");
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    public void setupLocation(){
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        Log.v(TAG,"finding location");
+        if (mLastLocation != null) {
+            Log.v(TAG,"last location");
+            location = String.valueOf(mLastLocation.getLatitude()) + "," + String.valueOf(mLastLocation.getLongitude());
+            checkHistory();
+        }
+    }
+
+    public void storeHistory(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String cno_water=sharedPref.getString(SettingsActivity.CUSTOMER_NO_WATER, "");
+        String cno_electricity=sharedPref.getString(SettingsActivity.CUSTOMER_NO_ELECTRICITY, "");
+
+        JSONArray dataWater=getDataWater();
+        Log.v(TAG,"Data: "+dataWater);
+        (new HistoryTask(cno_water,"water",dataWater,this)).execute();
+
+        JSONArray dataElectricity=getDataElectricity();
+        Log.v(TAG,"Data: "+dataElectricity);
+        (new HistoryTask(cno_electricity,"electricity",dataElectricity,this)).execute();
+    }
+
+    public JSONArray getDataWater(){
+        JSONArray data=new JSONArray();
+
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String[] projection = {
+                DatabaseContract.WaterEntry.METER_READING,DatabaseContract.WaterEntry.CYCLE_START_ID,
+                DatabaseContract.WaterEntry.READING_DATE
+        };
+
+        Cursor c = db.query(
+                DatabaseContract.WaterEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        Log.v(TAG,"Count"+c.getCount());
+
+        while (c.moveToNext()) {
+            JSONObject storeObject=new JSONObject();
+            long itemId = c.getLong(c.getColumnIndexOrThrow(DatabaseContract.WaterEntry.CYCLE_START_ID));
+
+            String selection = DatabaseContract.WaterEntry._ID + " = ?";
+            String[] selectionArgs = { String.valueOf(itemId) };
+
+            Cursor c1 = db.query(
+                    DatabaseContract.WaterEntry.TABLE_NAME,  // The table to query
+                    projection,                               // The columns to return
+                    selection,                                // The columns for the WHERE clause
+                    selectionArgs,                            // The values for the WHERE clause
+                    null,null,null);
+
+            if (c1 != null && c1.moveToFirst()) {
+                long cycle_start_reading = c1.getLong(c1.getColumnIndexOrThrow(DatabaseContract.WaterEntry.METER_READING));
+                String cycle_start_date = c1.getString(c1.getColumnIndexOrThrow(DatabaseContract.WaterEntry.READING_DATE));
+                long meter_reading = c.getLong(c.getColumnIndexOrThrow(DatabaseContract.WaterEntry.METER_READING));
+                String reading_date = c.getString(c.getColumnIndexOrThrow(DatabaseContract.WaterEntry.READING_DATE));
+
+                try {
+                    storeObject.put("meter_reading", meter_reading);
+                    storeObject.put("reading_date", reading_date);
+                    storeObject.put("cycle_start_reading", cycle_start_reading);
+                    storeObject.put("cycle_start_date", cycle_start_date);
+                    storeObject.put("location", location);
+
+                    data.put(storeObject);
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return data;
+    }
+
+    public JSONArray getDataElectricity(){
+        JSONArray data=new JSONArray();
+
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        String[] projection = {
+                DatabaseContract.ElectricityEntry.METER_READING,DatabaseContract.ElectricityEntry.CYCLE_START_ID,
+                DatabaseContract.ElectricityEntry.READING_DATE
+        };
+
+        Cursor c = db.query(
+                DatabaseContract.ElectricityEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        Log.v(TAG,"Count"+c.getCount());
+
+        while (c.moveToNext()) {
+            JSONObject storeObject=new JSONObject();
+            long itemId = c.getLong(c.getColumnIndexOrThrow(DatabaseContract.ElectricityEntry.CYCLE_START_ID));
+
+            String selection = DatabaseContract.ElectricityEntry._ID + " = ?";
+            String[] selectionArgs = { String.valueOf(itemId) };
+
+            Cursor c1 = db.query(
+                    DatabaseContract.WaterEntry.TABLE_NAME,  // The table to query
+                    projection,                               // The columns to return
+                    selection,                                // The columns for the WHERE clause
+                    selectionArgs,                            // The values for the WHERE clause
+                    null,null,null);
+
+            if (c1 != null && c1.moveToFirst()) {
+                long cycle_start_reading = c1.getLong(c1.getColumnIndexOrThrow(DatabaseContract.ElectricityEntry.METER_READING));
+                String cycle_start_date = c1.getString(c1.getColumnIndexOrThrow(DatabaseContract.ElectricityEntry.READING_DATE));
+                long meter_reading = c.getLong(c.getColumnIndexOrThrow(DatabaseContract.ElectricityEntry.METER_READING));
+                String reading_date = c.getString(c.getColumnIndexOrThrow(DatabaseContract.ElectricityEntry.READING_DATE));
+
+                try {
+                    storeObject.put("meter_reading", meter_reading);
+                    storeObject.put("reading_date", reading_date);
+                    storeObject.put("cycle_start_reading", cycle_start_reading);
+                    storeObject.put("cycle_start_date", cycle_start_date);
+                    storeObject.put("location", location);
+
+                    data.put(storeObject);
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return data;
+    }
+
+    private boolean checkPlayServices() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (status != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(status)) {
+                showErrorDialog(status);
+            } else {
+                Toast.makeText(this, "This device is not supported.",
+                        Toast.LENGTH_LONG).show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    void showErrorDialog(int code) {
+        GooglePlayServicesUtil.getErrorDialog(code, this,
+                REQUEST_CODE_RECOVER_PLAY_SERVICES).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_RECOVER_PLAY_SERVICES:
+                if (resultCode == RESULT_CANCELED) {
+                    Toast.makeText(this, "Google Play Services must be installed.",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -170,12 +403,39 @@ public class MainTabActivity extends ActionBarActivity implements ActionBar.TabL
 
     @Override
     public void onRegisterComplete(String msg) {
-        if(msg.contains("success")){
+        Log.v(TAG,msg);
+        if(msg.contains("200 OK")){
             Toast.makeText(this,"Registered",Toast.LENGTH_SHORT);
             SharedPreferences sharedPref=PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor=sharedPref.edit();
             editor.putBoolean("REGISTERED_CUSTOMER", true);
             editor.commit();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        setupLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onHistoryComplete(String msg) {
+        Log.v(TAG,msg);
+        if(msg.contains("200 OK")){
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor edit = sharedPref.edit();
+            edit.putBoolean("HISTORY_CUSTOMER",false);
+            edit.commit();
         }
     }
 

@@ -35,12 +35,13 @@ public class StoreTask extends AsyncTask<Void, Void, String> {
         this.scl=scl;
         storeObject = new JSONObject();
         try {
-            storeObject.put("cno", cno);
+            storeObject.put("customer_no", cno);
             storeObject.put("type", type);
             storeObject.put("meter_reading", meter_reading);
             storeObject.put("reading_date", reading_date);
             storeObject.put("cycle_start_reading", cycle_start_reading);
             storeObject.put("cycle_start_date", cycle_start_date);
+            storeObject.put("location",location);
         }
         catch (JSONException e){
             e.printStackTrace();

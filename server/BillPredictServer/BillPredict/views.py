@@ -47,18 +47,30 @@ def update_cycle_water(entry,cno):
 	response = "Updated water cycle data successfully"
 	try:
 		customer=CustomerProfile.objects.get(customer_no_water=cno)
+		old_entry=Water.objects.get(customer=customer,meter_reading=entry.get('old_cycle_reading'))
 	except CustomerProfile.DoesNotExist:
 		return HttpResponse(status=400)
 	Water.objects.filter(customer=customer,cycle_start_reading=entry.get('old_cycle_reading')).update(cycle_start_reading=entry.get('new_cycle_reading'))
+	
+	old_entry.meter_reading=entry.get('new_cycle_reading')
+	old_entry.cycle_start_reading=entry.get('new_cycle_reading')
+	old_entry.save()
+
 	return HttpResponse(response)
 
 def update_cycle_electricity(entry,cno):
 	response = "Updated electricity cycle data successfully"
 	try:
 		customer=CustomerProfile.objects.get(customer_no_electricity=cno)
+		old_entry=Electricity.objects.get(customer=customer,meter_reading=entry.get('old_cycle_reading'))
 	except CustomerProfile.DoesNotExist:
 		return HttpResponse(status=400)
 	Electricity.objects.filter(customer=customer,cycle_start_reading=entry.get('old_cycle_reading')).update(cycle_start_reading=entry.get('new_cycle_reading'))
+
+	old_entry.meter_reading=entry.get('new_cycle_reading')
+	old_entry.cycle_start_reading=entry.get('new_cycle_reading')
+	old_entry.save()
+
 	return HttpResponse(response)
 
 @csrf_exempt
@@ -90,6 +102,14 @@ def store_water(entry,cno):
 
 	# print(entry.get('reading_date'))
 	reading_date=dateutil.parser.parse(entry.get('reading_date'))
+
+	objs=Water.objects.filter(customer=customer,meter_reading = entry.get('meter_reading'),reading_date = reading_date);
+	
+	if not objs:
+		print "New Entry"
+	elif(objs.count()>0):
+		return HttpResponse(status=409)
+
 	cs_date=dateutil.parser.parse(entry.get('cycle_start_date'))
 	waterEntry=Water(customer=customer,meter_reading = entry.get('meter_reading'),
 		reading_date = reading_date,cycle_start_reading = entry.get('cycle_start_reading'),
@@ -102,12 +122,19 @@ def store_electricity(entry,cno):
 	response = "Stored electricity data successfully"
 	print(entry)
 	try:
-		customer=CustomerProfile.objects.get(customer_no_water=cno)
+		customer=CustomerProfile.objects.get(customer_no_electricity=cno)
 	except CustomerProfile.DoesNotExist:
 		return HttpResponse(status=400)
 
 	# print(entry.get('reading_date'))
 	reading_date=dateutil.parser.parse(entry.get('reading_date'))
+	objs=Electricity.objects.filter(customer=customer,meter_reading = entry.get('meter_reading'),reading_date = reading_date);
+	
+	if not objs:
+		print "New Entry"
+	elif(objs.count()>0):
+		return HttpResponse(status=409)
+
 	cs_date=dateutil.parser.parse(entry.get('cycle_start_date'))
 	electricityEntry=Electricity(customer=customer,meter_reading = entry.get('meter_reading'),
 		reading_date = reading_date,cycle_start_reading = entry.get('cycle_start_reading'),
@@ -143,7 +170,7 @@ def update_water(entry,cno):
 
 	return HttpResponse(response)
 
-def update_water(entry,cno):
+def update_electricity(entry,cno):
 	response = "Updated electricity data successfully"
 	print(entry)
 	try:
@@ -157,6 +184,55 @@ def update_water(entry,cno):
 	# print(entry.get('reading_date'))
 	old_entry.meter_reading=entry.get('new_reading')
 	old_entry.save()
+
+	return HttpResponse(response)
+
+@csrf_exempt
+def delete(request):
+    if request.method == 'PUT':
+    	return delete_data(request)
+    else:
+    	return HttpResponse(status=405)
+
+def delete_data(request):
+	# print(request.body)
+	json_data=json.loads(request.body)
+	if(json_data.get('type')=="water"):
+		return delete_water(json_data,json_data.get('customer_no'))
+	elif(json_data.get('type')=="electricity"):
+		return delete_electricity(json_data,json_data.get('customer_no'))
+
+	return HttpResponse(status=400)
+
+def delete_water(entry,cno):
+	response = "Deleted water data successfully"
+	print(entry)
+	try:
+		customer=CustomerProfile.objects.get(customer_no_water=cno)
+		old_entry=Water.objects.get(customer=customer,meter_reading=entry.get('meter_reading'))
+	except CustomerProfile.DoesNotExist:
+		return HttpResponse(status=400)
+	except Water.DoesNotExist:
+		return HttpResponse(status=400)
+
+	# print(entry.get('reading_date'))
+	old_entry.delete()
+
+	return HttpResponse(response)
+
+def delete_electricity(entry,cno):
+	response = "Deleted electricity data successfully"
+	print(entry)
+	try:
+		customer=CustomerProfile.objects.get(customer_no_electricity=cno)
+		old_entry=Electricity.objects.get(customer=customer,meter_reading=entry.get('meter_reading'))
+	except CustomerProfile.DoesNotExist:
+		return HttpResponse(status=400)
+	except Electricity.DoesNotExist:
+		return HttpResponse(status=400)
+
+	# print(entry.get('reading_date'))
+	old_entry.delete()
 
 	return HttpResponse(response)
 
@@ -188,6 +264,13 @@ def store_old_water(data,cno):
 	for entry in data:
 		# print(entry.get('reading_date'))
 		reading_date=dateutil.parser.parse(entry.get('reading_date'))
+		objs=Water.objects.filter(customer=customer,meter_reading = entry.get('meter_reading'),reading_date = reading_date);
+		
+		if not objs:
+			print "New Entry"
+		elif(objs.count()>0):
+			continue
+
 		cs_date=dateutil.parser.parse(entry.get('cycle_start_date'))
 		waterEntry=Water(customer=customer,meter_reading = entry.get('meter_reading'),
 			reading_date = reading_date,cycle_start_reading = entry.get('cycle_start_reading'),
@@ -197,7 +280,7 @@ def store_old_water(data,cno):
 	return HttpResponse(response)
 
 
-def store_old_electricity():
+def store_old_electricity(data,cno):
 	response = "Stored electricity history successfully"
 	print(data)
 	try:
@@ -208,10 +291,18 @@ def store_old_electricity():
 	for entry in data:
 		# print(entry.get('reading_date'))
 		reading_date=dateutil.parser.parse(entry.get('reading_date'))
+		reading_date=dateutil.parser.parse(entry.get('reading_date'))
+		objs=Electricity.objects.filter(customer=customer,meter_reading = entry.get('meter_reading'),reading_date = reading_date);
+		
+		if not objs:
+			print "New Entry"
+		elif(objs.count()>0):
+			continue
+
 		cs_date=dateutil.parser.parse(entry.get('cycle_start_date'))
 		electricityEntry=Electricity(customer=customer,meter_reading = entry.get('meter_reading'),
 			reading_date = reading_date,cycle_start_reading = entry.get('cycle_start_reading'),
 			cycle_start_date = cs_date,location = entry.get('location')	)
-		waterEntry.save()
+		electricityEntry.save()
 
 	return HttpResponse(response)

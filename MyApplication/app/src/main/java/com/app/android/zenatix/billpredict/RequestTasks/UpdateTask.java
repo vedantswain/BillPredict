@@ -34,7 +34,7 @@ public class UpdateTask extends AsyncTask<Void, Void, String> {
         this.ucl=ucl;
         storeObject = new JSONObject();
         try {
-            storeObject.put("cno", cno);
+            storeObject.put("customer_no", cno);
             storeObject.put("type", type);
             storeObject.put("old_reading", old_reading);
             storeObject.put("new_reading", new_reading);
